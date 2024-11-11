@@ -5,7 +5,7 @@ model_checkpoint = "t5-small"
 from datasets import load_dataset
 from evaluate import load
 import nltk
-nltk.download('punkt')
+nltk.download('punkt_tab')
 
 raw_datasets = load_dataset("xsum")
 metric = load("rouge")
@@ -50,7 +50,7 @@ args = Seq2SeqTrainingArguments(
 
 data_collator = DataCollatorForSeq2Seq(tokenizer,model=model)
 
-import numpy as numpy
+import numpy as np
 nltk.download('punkt')
 
 def compute_metrics(eval_pred):
@@ -63,14 +63,14 @@ def compute_metrics(eval_pred):
     decoded_preds = ['\n'.join(nltk.sent_tokenize(pred.strip())) for pred in decoded_preds]
     decoded_labels = ['\n'.join(nltk.sent_tokenize(label.strip())) for label in decoded_labels]
 
-    result = metric.compute(predictions = decoded_preds, references = decoded_labels, user_stemmer=True)
+    result = metric.compute(predictions = decoded_preds, references = decoded_labels, use_stemmer=True)
     result = {key: value.mid.fmeasure *100 for key, value in result.items()}
     
     #에측 길이 평균
     predictions_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in predictions]
     result['gen_len'] = np.mean(predictions_lens)
 
-    return {k: rount(v,4) for k,v in result.items()}
+    return {k: round(v,4) for k,v in result.items()}
 
 trainer = Seq2SeqTrainer(
     model,
