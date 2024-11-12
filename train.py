@@ -64,7 +64,7 @@ def compute_metrics(eval_pred):
     decoded_labels = ['\n'.join(nltk.sent_tokenize(label.strip())) for label in decoded_labels]
 
     result = metric.compute(predictions = decoded_preds, references = decoded_labels, use_stemmer=True)
-    result = {key: value.mid.fmeasure *100 for key, value in result.items()}
+    result = {key: value *100 for key, value in result.items()}
     
     #에측 길이 평균
     predictions_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in predictions]
@@ -85,4 +85,4 @@ trainer = Seq2SeqTrainer(
 trainer.train()
 
 pred = trainer.predict(tokenized_datasets['test'])
-print(compute_metrics(pred.predictions, tokenized_datasets['labels']))
+print(compute_metrics(pred.predictions, pred.label_ids))
